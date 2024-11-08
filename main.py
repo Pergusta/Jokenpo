@@ -11,8 +11,8 @@ backup = ["Pedra", "Papel", "Tesoura", "Lagarto", "Spock!"]
 computador = randint(0,4)
 player = -1
 start = False
-janela_lar = 700
-janela_alt = 600
+janela_lar = 500
+janela_alt = 500
 pontoA = 0
 pontoB = 0
 
@@ -33,8 +33,8 @@ def jokenpo():
     global start, computador
     if player != -1:
         for i in range(len(palavras)):
-            preparo.config(text=backup[i])
-            janela.after(i * 1000, lambda i=i: preparo.config(text=backup[i]))
+            canva.itemconfig(preparo, text=backup[i])
+            janela.after(i * 1000, lambda i=i: canva.itemconfig(preparo, text=backup[i]))
         janela.after(len(palavras) * 1000, vesetacerto)
         start = True
 
@@ -67,10 +67,10 @@ def vesetacerto():
     # Atualizando os pontos
     if vitoria == 1:
         pontoA += 1
-        pontosa.config(text=pontoA)
+        pontosa.config(text="{:02d}".format(pontoA))
     elif vitoria == 2:
         pontoB += 1
-        pontosb.config(text=pontoB)
+        pontosb.config(text="{:02d}".format(pontoB))
     
     # Terminar o jogo
     start = False
@@ -98,7 +98,7 @@ def boraconferi(player, computador):
 
 # Definições da janela (faz ela ter duas telas, renomeia, tamanho inalterável e deixa centralizada em qualquer monitor)
 janela = Tk()
-janela.iconbitmap(r"C:\Codes\Jokenpo\imagem\icon.ico")
+janela.iconbitmap("imagem/icon.ico")
 tela1 = Frame(janela)
 tela2 = Frame(janela)
 tela2 = tk.Frame(janela, bg="white")
@@ -110,55 +110,70 @@ pos_x = (lar_monitor // 2) - (janela_lar // 2)
 pos_y = (alt_monitor // 2) - (janela_alt // 2)
 janela.geometry(f"{janela_lar}x{janela_alt}+{pos_x}+{pos_y}")
 
-# Processo de leitura da imagem para o background
-bg = Image.open(r"C:\Codes\Jokenpo\imagem\background.png")
-imagem_fundo = bg.resize((700, 600))
-imagem_fundo_tk = ImageTk.PhotoImage(imagem_fundo)
-label_fundo = Label(tela1, image=imagem_fundo_tk)
-label_fundo.place(x=0, y=0, relwidth=1, relheight=1)
+# Criação de um canvas para trabalhar com os Widgets na tela1
+canva = Canvas(tela1,width=janela_lar, height=janela_alt,bg = 'white',highlightthickness=0)
+canva.pack()
+
+# Processo de formatação da imagem para o background
+img = PhotoImage(file='imagem/background.png')
+foto = canva.create_image(0,0, anchor=NW,image=img)
 
 # Coisas que tem na tela 1
 irajuda = Button(tela1, text="REGRAS", command=irtela2)
-botao1 = Button(tela1, text='Pedra', height=5, width=12, command=lambda: opicao(0))
-botao2 = Button(tela1, text='Papel', height=5, width=12, command=lambda: opicao(1))
-botao3 = Button(tela1, text='Tesoura', height=5, width=12, command=lambda: opicao(2))
-botao4 = Button(tela1, text='Lagarto', height=5, width=12, command=lambda: opicao(3))
-botao5 = Button(tela1, text='Spock', height=5, width=12, command=lambda: opicao(4))
+pedrabtn = PhotoImage(file = 'imagem/pedra.png')
+botao1 = Button(tela1, image = pedrabtn, command = lambda: opicao(0))
+papelbtn = PhotoImage(file = 'imagem/papel.png')
+botao2 = Button(tela1, image = papelbtn, command=lambda: opicao(1))
+tesbtn = PhotoImage(file = 'imagem/tesoura.png')
+botao3 = Button(tela1, image = tesbtn, command=lambda: opicao(2))
+lagbtn = PhotoImage(file = 'imagem/lagarto.png')
+botao4 = Button(tela1, image = lagbtn, command=lambda: opicao(3))
+spockbtn = PhotoImage(file = 'imagem/spock.png')
+botao5 = Button(tela1, image = spockbtn, command=lambda: opicao(4))
 
-pontosa = Label(tela1, text='', bg='black', fg='orange', font=("Arial", 20))
-pontosb = Label(tela1, text='', bg='black', fg='orange', font=("Arial", 20))
-preparo = Label(tela1, text='', bg='black', fg='yellow', font=("Arial", 20))
-p = Label(tela1, text='FAÇA SUA ESCOLHA', bg='black', fg='white', font=("Arial", 20))
-jogada_player = Label(tela1, text='', bg='black', fg='white', font=("Arial", 15))
-jogada_computador = Label(tela1, text='', bg='black', fg='white', font=("Arial", 15))
-resultado = Label(tela1, text='', bg='black', fg='white', font=("Arial", 15))
-vs = Label(tela1, text='VS', bg='black', fg='white', font=("Arial", 40))
+pontosa = Label(tela1, text='    ', bg='white', fg='orange', font=("Arial", 20))
+pontosb = Label(tela1, text='    ', bg='white', fg='orange', font=("Arial", 20))
 
-# Colocar os botões de escolha na parte de baixo da tela
-espaço = Label(tela1, text='', bg='black', fg='black')
+jogada_player = Label(tela1, text='', bg='black', fg='white', font=("Arial", 12))
+jogada_computador = Label(tela1, text='', bg='black', fg='white', font=("Arial", 12))
+resultado = Label(tela1, text='', bg='black', fg='white', font=("Arial", 16))
+vsimg = PhotoImage(file = 'imagem/vs.png')
+vsfoto = Label(tela1, image=vsimg)
 
-# Posicionamento das coisas que tem na janela
-p.pack(pady=30)
-irajuda.pack(pady=20)
-preparo.pack()
-jogada_player.pack()
-jogada_computador.pack()
-pontosa.pack(side='left')
-pontosb.pack(side='right')
-resultado.pack()
-vs.pack()
-espaço.pack(pady=(0, 140))
-botao1.pack(side="left", padx=(75, 10))
-botao2.pack(side="left", padx=10)
-botao3.pack(side="left", padx=10)
-botao4.pack(side="left", padx=10)
-botao5.pack(side="left", padx=(10, 75))
+# Posicionamento das coisas que tem na tela1 com o canvas
+canva.create_text(250, 30, text="FAÇA SUA ESCOLHA", font=("Arial", 20), fill="white") #titulo
+canva.create_window(250, 70, window=irajuda, anchor="center") #botao de regras
+canva.configure(scrollregion=canva.bbox("all"))
+preparo = canva.create_text(250, 130, text="", fill="yellow", font=("Arial", 18)) #jokenpo
+canva.create_window(100, 250, window=jogada_player, anchor="center") #resgistro de jogada do player
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(400, 250, window=jogada_computador, anchor="center") #registro de jogada do pc
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(250, 180, window=resultado, anchor="center") #resultado
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(100, 130, window=pontosa, anchor="center") #qntd de pontos player
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(400, 130, window=pontosb, anchor="center") #qntd de pontos pc
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(250, 250, window=vsfoto, anchor="center") #foto do versus
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(50, 450, window=botao1, anchor="center") #btn pedra
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(150, 450, window=botao2, anchor="center") #btn papel
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(250, 450, window=botao3, anchor="center") #btn tesoura
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(350, 450, window=botao4, anchor="center") #btn largato
+canva.configure(scrollregion=canva.bbox("all"))
+canva.create_window(450, 450, window=botao5, anchor="center") #btn spock
+canva.configure(scrollregion=canva.bbox("all"))
+
 
 # Coisas da tela 2
 btnvoltar = Button(tela2, text="Voltar", command=voltartela1)
 
 # Processo para ler e converter a imagem das regras para que o tk consiga mostrar
-img_regras = Image.open(r"C:\Codes\Jokenpo\imagem\regras.png")
+img_regras = Image.open("imagem/regras.png")
 img_regras_tk = ImageTk.PhotoImage(img_regras)
 label_img = Label(tela2, image=img_regras_tk)
 label_img.pack(pady=20)

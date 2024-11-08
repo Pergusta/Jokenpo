@@ -3,7 +3,7 @@ from tkinter import *
 import tkinter as tk
 from random import randint 
 from PIL import Image, ImageTk
-
+from tkinter import font as tkfont
 
 ## Variáveis
 palavras = ["Pedra", "Papel", "Tesoura", "Lagarto", "Spock"]
@@ -42,7 +42,7 @@ def jokenpo():
 def limpeza_total():
     jogada_player.config(text="")
     jogada_computador.config(text="")
-    resultado.config(text="")
+    canva.itemconfig(resultado, text="")
 
 # Escolha do jogador e atualização do estado
 def opicao(opcoes):
@@ -62,15 +62,15 @@ def vesetacerto():
     jogada_player.config(text="PLAYER: " + palavras[player])
 
     resultado_final, cor, vitoria = boraconferi(player, computador)
-    resultado.config(text=resultado_final, fg=cor)
+    canva.itemconfig(resultado, text=resultado_final, fill=cor)
     
     # Atualizando os pontos
     if vitoria == 1:
         pontoA += 1
-        pontosa.config(text="{:02d}".format(pontoA))
+        canva.itemconfig(pontosa, text="{:02d}".format(pontoA))
     elif vitoria == 2:
         pontoB += 1
-        pontosb.config(text="{:02d}".format(pontoB))
+        canva.itemconfig(pontosb, text="{:02d}".format(pontoB))
     
     # Terminar o jogo
     start = False
@@ -118,6 +118,9 @@ canva.pack()
 img = PhotoImage(file='imagem/background.png')
 foto = canva.create_image(0,0, anchor=NW,image=img)
 
+# Customização da fonte
+serifnegrito = tkfont.Font(family="MS Sans Serif", size=22, weight="bold")
+
 # Coisas que tem na tela 1
 irajuda = Button(tela1, text="REGRAS", command=irtela2)
 pedrabtn = PhotoImage(file = 'imagem/pedra.png')
@@ -131,32 +134,31 @@ botao4 = Button(tela1, image = lagbtn, command=lambda: opicao(3))
 spockbtn = PhotoImage(file = 'imagem/spock.png')
 botao5 = Button(tela1, image = spockbtn, command=lambda: opicao(4))
 
-pontosa = Label(tela1, text='    ', bg='white', fg='orange', font=("Arial", 20))
-pontosb = Label(tela1, text='    ', bg='white', fg='orange', font=("Arial", 20))
-
-jogada_player = Label(tela1, text='', bg='black', fg='white', font=("Arial", 12))
-jogada_computador = Label(tela1, text='', bg='black', fg='white', font=("Arial", 12))
-resultado = Label(tela1, text='', bg='black', fg='white', font=("Arial", 16))
+jogada_player = Label(tela1, text='', bg='black', fg='white', font=("MS Sans Serif", 12))
+jogada_computador = Label(tela1, text='', bg='black', fg='white', font=("MS Sans Serif", 12))
 vsimg = PhotoImage(file = 'imagem/vs.png')
-vsfoto = Label(tela1, image=vsimg)
+scplay = PhotoImage(file = 'imagem/scoreplayer.png')
+scpc = PhotoImage(file = 'imagem/scorepc.png')
 
 # Posicionamento das coisas que tem na tela1 com o canvas
-canva.create_text(250, 30, text="FAÇA SUA ESCOLHA", font=("Arial", 20), fill="white") #titulo
+canva.create_text(250, 30, text="FAÇA SUA ESCOLHA", font=serifnegrito, fill="white") #titulo
+canva.create_text(100, 340, text="PLAYER", font=("MS Sans Serif", 16), fill="white") #nome player
+canva.create_text(400, 340, text="COMPUTADOR", font=("MS Sans Serif", 16), fill="white") #nome pc
 canva.create_window(250, 70, window=irajuda, anchor="center") #botao de regras
 canva.configure(scrollregion=canva.bbox("all"))
-preparo = canva.create_text(250, 130, text="", fill="yellow", font=("Arial", 18)) #jokenpo
-canva.create_window(100, 250, window=jogada_player, anchor="center") #resgistro de jogada do player
+preparo = canva.create_text(250, 130, text="", fill="yellow", font=("MS Sans Serif", 18)) #jokenpo
+canva.create_window(100, 250, window=jogada_player, anchor="center") #resgistro de jogada player
 canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(400, 250, window=jogada_computador, anchor="center") #registro de jogada do pc
+canva.create_window(400, 250, window=jogada_computador, anchor="center") #registro de jogada pc
 canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(250, 180, window=resultado, anchor="center") #resultado
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(100, 130, window=pontosa, anchor="center") #qntd de pontos player
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(400, 130, window=pontosb, anchor="center") #qntd de pontos pc
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(250, 250, window=vsfoto, anchor="center") #foto do versus
-canva.configure(scrollregion=canva.bbox("all"))
+resultado = canva.create_text(250, 180, text="", font=serifnegrito) #resultado
+pontosa = canva.create_text(100, 130, text="00", fill="white", font=serifnegrito) #qntd de pontos player
+pontosb = canva.create_text(400, 130, text="00", fill="black", font=serifnegrito) #qntd de pontos pc
+canva.create_image(250, 250, image=vsimg, anchor="center") #foto do versus
+canva.create_image(90, 130, image=scplay, anchor="center") #foto do score player
+canva.create_image(410, 130, image=scpc, anchor="center") #foto do score pc
+canva.tag_raise(pontosa)
+canva.tag_raise(pontosb)
 canva.create_window(50, 450, window=botao1, anchor="center") #btn pedra
 canva.configure(scrollregion=canva.bbox("all"))
 canva.create_window(150, 450, window=botao2, anchor="center") #btn papel

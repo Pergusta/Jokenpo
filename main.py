@@ -40,8 +40,10 @@ def jokenpo():
 
 # Função para limpar as informações antigas
 def limpeza_total():
-    jogada_player.config(text="")
-    jogada_computador.config(text="")
+    canva.itemconfigure(maodireita, image=maoflipfinal)
+    canva.itemconfigure(maoesquerda, image=maonormal)
+    canva.itemconfig(jogada_player, text="")
+    canva.itemconfig(jogada_computador, text="")
     canva.itemconfig(resultado, text="")
 
 # Escolha do jogador e atualização do estado
@@ -54,12 +56,35 @@ def opicao(opcoes):
     computador = randint(0, 4)
     jokenpo()
 
+def trocafoto():
+    if computador == 0:
+        canva.itemconfigure(maodireita, image=maopeflipfinal)
+    elif computador == 1:
+        canva.itemconfigure(maodireita, image=maopaflipfinal)
+    elif computador == 2:
+        canva.itemconfigure(maodireita, image=maotesflipfinal)
+    elif computador == 3:
+        canva.itemconfigure(maodireita, image=maolagflipfinal)
+    elif computador == 4:
+        canva.itemconfigure(maodireita, image=maospoflipfinal)
+
+    if player == 0:
+        canva.itemconfigure(maoesquerda, image=maopedra)
+    elif player == 1:
+        canva.itemconfigure(maoesquerda, image=maopapel)
+    elif player == 2:
+        canva.itemconfigure(maoesquerda, image=maotesora)
+    elif player == 3:
+        canva.itemconfigure(maoesquerda, image=maolargato)
+    elif player == 4:
+        canva.itemconfigure(maoesquerda, image=maospock)
+
 # Comparar as respostas
 def vesetacerto():
     global start, player, computador, pontoA, pontoB
-
-    jogada_computador.config(text="COMPUTADOR: " + palavras[computador])
-    jogada_player.config(text="PLAYER: " + palavras[player])
+    trocafoto()
+    canva.itemconfig(jogada_computador, text=palavras[computador])
+    canva.itemconfig(jogada_player, text=palavras[player])
 
     resultado_final, cor, vitoria = boraconferi(player, computador)
     canva.itemconfig(resultado, text=resultado_final, fill=cor)
@@ -134,11 +159,40 @@ botao4 = Button(tela1, image = lagbtn, command=lambda: opicao(3))
 spockbtn = PhotoImage(file = 'imagem/spock.png')
 botao5 = Button(tela1, image = spockbtn, command=lambda: opicao(4))
 
-jogada_player = Label(tela1, text='', bg='black', fg='white', font=("MS Sans Serif", 12))
-jogada_computador = Label(tela1, text='', bg='black', fg='white', font=("MS Sans Serif", 12))
 vsimg = PhotoImage(file = 'imagem/vs.png')
 scplay = PhotoImage(file = 'imagem/scoreplayer.png')
 scpc = PhotoImage(file = 'imagem/scorepc.png')
+maonormal = PhotoImage(file = 'imagem/maonormal.png')
+maopedra = PhotoImage(file = 'imagem/maopedra.png')
+maopapel = PhotoImage(file = 'imagem/maopapel.png')
+maotesora = PhotoImage(file = 'imagem/maotesora.png')
+maolargato = PhotoImage(file = 'imagem/maolargato.png')
+maospock = PhotoImage(file = 'imagem/maospock.png')
+
+# Flipar imagens para usar no COMPUTADOR
+maoflip = Image.open("imagem/maonormal.png")
+maoflip1 = maoflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maoflipfinal = ImageTk.PhotoImage(maoflip1)
+
+maopeflip = Image.open("imagem/maopedra.png")
+maopeflip1 = maopeflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maopeflipfinal = ImageTk.PhotoImage(maopeflip1)
+
+maopaflip = Image.open("imagem/maopapel.png")
+maopaflip1 = maopaflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maopaflipfinal = ImageTk.PhotoImage(maopaflip1)
+
+maotesflip = Image.open("imagem/maotesora.png")
+maotesflip1 = maotesflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maotesflipfinal = ImageTk.PhotoImage(maotesflip1)
+
+maolagflip = Image.open("imagem/maolargato.png")
+maolagflip1 = maolagflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maolagflipfinal = ImageTk.PhotoImage(maolagflip1)
+
+maospoflip = Image.open("imagem/maospock.png")
+maospoflip1 = maospoflip.transpose(Image.FLIP_LEFT_RIGHT)   
+maospoflipfinal = ImageTk.PhotoImage(maospoflip1)
 
 # Posicionamento das coisas que tem na tela1 com o canvas
 canva.create_text(250, 30, text="FAÇA SUA ESCOLHA", font=serifnegrito, fill="white") #titulo
@@ -147,10 +201,10 @@ canva.create_text(400, 340, text="COMPUTADOR", font=("MS Sans Serif", 16), fill=
 canva.create_window(250, 70, window=irajuda, anchor="center") #botao de regras
 canva.configure(scrollregion=canva.bbox("all"))
 preparo = canva.create_text(250, 130, text="", fill="yellow", font=("MS Sans Serif", 18)) #jokenpo
-canva.create_window(100, 250, window=jogada_player, anchor="center") #resgistro de jogada player
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(400, 250, window=jogada_computador, anchor="center") #registro de jogada pc
-canva.configure(scrollregion=canva.bbox("all"))
+maoesquerda = canva.create_image(100, 250, image=maonormal, anchor="center") # foto da jogada do player
+maodireita = canva.create_image(400, 250, image=maoflipfinal, anchor="center") # foto da jogada do computador
+jogada_player = canva.create_text(100, 200, text='', fill='white', font=("MS Sans Serif", 10), anchor="center") #registro de jogada player
+jogada_computador = canva.create_text(400, 200, text='', fill='white', font=("MS Sans Serif", 10), anchor="center")#registro de jogada pc
 resultado = canva.create_text(250, 180, text="", font=serifnegrito) #resultado
 pontosa = canva.create_text(100, 130, text="00", fill="white", font=serifnegrito) #qntd de pontos player
 pontosb = canva.create_text(400, 130, text="00", fill="black", font=serifnegrito) #qntd de pontos pc

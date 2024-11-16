@@ -118,6 +118,35 @@ def boraconferi(player, computador):
     else:
         return "Você perdeu!", 'red', 2
 
+# Função para animar o gif no Canvas
+def animacaogif(canva, localgif):
+    gif = Image.open(localgif)
+    frames = []
+
+    # Carregar todos os quadros do gif
+    try:
+        while True:
+            frames.append(gif.copy())
+            gif.seek(gif.tell() + 1)
+    except EOFError:
+        pass  # Fim do gif
+
+    # Variável para controlar o frame atual
+    frameagora = 0
+    fremes = []
+
+    # Função para atualizar o quadro a cada intervalo e fazer a animação
+    def animar():
+        nonlocal frameagora
+
+        frame = ImageTk.PhotoImage(frames[frameagora])
+        fremes.append(frame)
+        canva.delete("gif")
+        canva.tag_lower(canva.create_image(0, 0, image=frame, anchor="nw", tags="gif"))
+        frameagora = (frameagora + 1) % len(frames)
+        janela.after(100, animar)
+
+    animar()
 
 ## Janela
 
@@ -136,29 +165,42 @@ pos_y = (alt_monitor // 2) - (janela_alt // 2)
 janela.geometry(f"{janela_lar}x{janela_alt}+{pos_x}+{pos_y}")
 
 # Criação de um canvas para trabalhar com os Widgets na tela1
-canva = Canvas(tela1,width=janela_lar, height=janela_alt,bg = 'white',highlightthickness=0)
-canva.pack()
+canva = Canvas(tela1, width=janela_lar, height=janela_alt, bg='white', highlightthickness=0)
+canva.pack(fill=BOTH, expand=True)
 
 # Processo de formatação da imagem para o background
-img = PhotoImage(file='imagem/background.png')
-foto = canva.create_image(0,0, anchor=NW,image=img)
+localgif = 'imagem/background.gif'
+animacaogif(canva, localgif)
 
 # Customização da fonte
 serifnegrito = tkfont.Font(family="MS Sans Serif", size=22, weight="bold")
 
 # Coisas que tem na tela 1
 irajuda = Button(tela1, text="REGRAS", command=irtela2)
-pedrabtn = PhotoImage(file = 'imagem/pedra.png')
-botao1 = Button(tela1, image = pedrabtn, command = lambda: opicao(0))
-papelbtn = PhotoImage(file = 'imagem/papel.png')
-botao2 = Button(tela1, image = papelbtn, command=lambda: opicao(1))
-tesbtn = PhotoImage(file = 'imagem/tesoura.png')
-botao3 = Button(tela1, image = tesbtn, command=lambda: opicao(2))
-lagbtn = PhotoImage(file = 'imagem/lagarto.png')
-botao4 = Button(tela1, image = lagbtn, command=lambda: opicao(3))
-spockbtn = PhotoImage(file = 'imagem/spock.png')
-botao5 = Button(tela1, image = spockbtn, command=lambda: opicao(4))
 
+imgpedra = Image.open("imagem/pedra.png")
+imgpapel = Image.open("imagem/papel.png")
+imgtesoura = Image.open("imagem/tesoura.png")
+imglagarto = Image.open("imagem/lagarto.png")
+imgspock = Image.open("imagem/spock.png")
+
+fotope = ImageTk.PhotoImage(imgpedra)
+btn1 = canva.create_image(50, 450, image=fotope, tags="botao")
+canva.tag_bind(btn1, "<Button-1>", lambda event: opicao(0)) #btn pedra
+fotopa = ImageTk.PhotoImage(imgpapel)
+btn2 = canva.create_image(150, 450, image=fotopa, tags="botao")
+canva.tag_bind(btn2, "<Button-1>", lambda event: opicao(1)) #btn papel
+fototes = ImageTk.PhotoImage(imgtesoura)
+btn3 = canva.create_image(250, 450, image=fototes, tags="botao")
+canva.tag_bind(btn3, "<Button-1>", lambda event: opicao(2)) #btn tesoura
+fotolag = ImageTk.PhotoImage(imglagarto)
+btn4 = canva.create_image(350, 450, image=fotolag, tags="botao")
+canva.tag_bind(btn4, "<Button-1>", lambda event: opicao(3)) #btn lagarto
+fotospo = ImageTk.PhotoImage(imgspock)
+btn5 = canva.create_image(450, 450, image=fotospo, tags="botao")
+canva.tag_bind(btn5, "<Button-1>", lambda event: opicao(4)) #btn spock
+
+logo = PhotoImage(file = 'imagem/logo.png')
 vsimg = PhotoImage(file = 'imagem/vs.png')
 scplay = PhotoImage(file = 'imagem/scoreplayer.png')
 scpc = PhotoImage(file = 'imagem/scorepc.png')
@@ -195,10 +237,9 @@ maospoflip1 = maospoflip.transpose(Image.FLIP_LEFT_RIGHT)
 maospoflipfinal = ImageTk.PhotoImage(maospoflip1)
 
 # Posicionamento das coisas que tem na tela1 com o canvas
-canva.create_text(250, 30, text="FAÇA SUA ESCOLHA", font=serifnegrito, fill="white") #titulo
 canva.create_text(100, 340, text="PLAYER", font=("MS Sans Serif", 16), fill="white") #nome player
-canva.create_text(400, 340, text="COMPUTADOR", font=("MS Sans Serif", 16), fill="white") #nome pc
-canva.create_window(250, 70, window=irajuda, anchor="center") #botao de regras
+canva.create_text(400, 340, text="PC", font=("MS Sans Serif", 16), fill="white") #nome pc
+canva.create_window(33, 20, window=irajuda, anchor="center") #botao de regras
 canva.configure(scrollregion=canva.bbox("all"))
 preparo = canva.create_text(250, 130, text="", fill="yellow", font=("MS Sans Serif", 18)) #jokenpo
 maoesquerda = canva.create_image(100, 250, image=maonormal, anchor="center") # foto da jogada do player
@@ -208,22 +249,12 @@ jogada_computador = canva.create_text(400, 200, text='', fill='white', font=("MS
 resultado = canva.create_text(250, 180, text="", font=serifnegrito) #resultado
 pontosa = canva.create_text(100, 130, text="00", fill="white", font=serifnegrito) #qntd de pontos player
 pontosb = canva.create_text(400, 130, text="00", fill="black", font=serifnegrito) #qntd de pontos pc
+canva.create_image(250, 65, image=logo, anchor="center") #foto logo
 canva.create_image(250, 250, image=vsimg, anchor="center") #foto do versus
 canva.create_image(90, 130, image=scplay, anchor="center") #foto do score player
 canva.create_image(410, 130, image=scpc, anchor="center") #foto do score pc
 canva.tag_raise(pontosa)
 canva.tag_raise(pontosb)
-canva.create_window(50, 450, window=botao1, anchor="center") #btn pedra
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(150, 450, window=botao2, anchor="center") #btn papel
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(250, 450, window=botao3, anchor="center") #btn tesoura
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(350, 450, window=botao4, anchor="center") #btn largato
-canva.configure(scrollregion=canva.bbox("all"))
-canva.create_window(450, 450, window=botao5, anchor="center") #btn spock
-canva.configure(scrollregion=canva.bbox("all"))
-
 
 # Coisas da tela 2
 btnvoltar = Button(tela2, text="Voltar", command=voltartela1)
@@ -236,5 +267,5 @@ label_img.pack(pady=20)
 btnvoltar.pack(pady=10)
 
 ## Execução da janela
-tela1.pack()
+tela1.pack(fill=BOTH, expand=True)
 janela.mainloop()

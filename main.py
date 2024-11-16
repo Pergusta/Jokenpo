@@ -2,13 +2,13 @@
 from tkinter import *
 import tkinter as tk
 from random import randint 
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageEnhance
 from tkinter import font as tkfont
 
 ## Variáveis
 palavras = ["Pedra", "Papel", "Tesoura", "Lagarto", "Spock"]
 backup = ["Pedra", "Papel", "Tesoura", "Lagarto", "Spock!"]
-computador = randint(0,4)
+computador = randint(0, 4)
 player = -1
 start = False
 janela_lar = 500
@@ -55,6 +55,7 @@ def opicao(opcoes):
     player = opcoes
     computador = randint(0, 4)
     jokenpo()
+
 
 def trocafoto():
     if computador == 0:
@@ -145,8 +146,24 @@ def animacaogif(canva, localgif):
         canva.tag_lower(canva.create_image(0, 0, image=frame, anchor="nw", tags="gif"))
         frameagora = (frameagora + 1) % len(frames)
         janela.after(100, animar)
-
     animar()
+
+def brilho(imagem, fator):
+    escurecer = ImageEnhance.Brightness(imagem)
+    return escurecer.enhance(fator)
+
+# Função para quando o botão for pressionado
+def pressionado(event, btn, canva, referencia):
+    canva.tag_bind("pedra", "<ButtonRelease>", lambda event: opicao(0))
+    canva.tag_bind("papel", "<ButtonRelease>", lambda event: opicao(1))
+    canva.tag_bind("tesoura", "<ButtonRelease>", lambda event: opicao(2))
+    canva.tag_bind("lagarto", "<ButtonRelease>", lambda event: opicao(3))
+    canva.tag_bind("spock", "<ButtonRelease>", lambda event: opicao(4))
+    canva.itemconfig(btn, image=referencia['preto'])
+
+# Função para quando o botão for solto
+def solto(event, btn, canva, referencia):
+    canva.itemconfig(btn, image=referencia['normal'])
 
 ## Janela
 
@@ -154,9 +171,8 @@ def animacaogif(canva, localgif):
 janela = Tk()
 janela.iconbitmap("imagem/icon.ico")
 tela1 = Frame(janela)
-tela2 = Frame(janela)
 tela2 = tk.Frame(janela, bg="white")
-janela.title("Pedra, Papel, Tesoura, Lagarto, Spock!")
+janela.title("Spacepô")
 janela.resizable(False, False)
 lar_monitor = janela.winfo_screenwidth()
 alt_monitor = janela.winfo_screenheight()
@@ -178,28 +194,58 @@ serifnegrito = tkfont.Font(family="MS Sans Serif", size=22, weight="bold")
 # Coisas que tem na tela 1
 irajuda = Button(tela1, text="REGRAS", command=irtela2)
 
+# Formatação das imagens dos botões
 imgpedra = Image.open("imagem/pedra.png")
-imgpapel = Image.open("imagem/papel.png")
-imgtesoura = Image.open("imagem/tesoura.png")
-imglagarto = Image.open("imagem/lagarto.png")
-imgspock = Image.open("imagem/spock.png")
-
+imgpepre = brilho(imgpedra, 0.5)
 fotope = ImageTk.PhotoImage(imgpedra)
-btn1 = canva.create_image(50, 450, image=fotope, tags="botao")
-canva.tag_bind(btn1, "<Button-1>", lambda event: opicao(0)) #btn pedra
+pedrapre = ImageTk.PhotoImage(imgpepre)
+imgpapel = Image.open("imagem/papel.png")
+imgpapre = brilho(imgpapel, 0.5)
 fotopa = ImageTk.PhotoImage(imgpapel)
-btn2 = canva.create_image(150, 450, image=fotopa, tags="botao")
-canva.tag_bind(btn2, "<Button-1>", lambda event: opicao(1)) #btn papel
+papelpre = ImageTk.PhotoImage(imgpapre)
+imgtesoura = Image.open("imagem/tesoura.png")
+imgtespre = brilho(imgtesoura, 0.5)
 fototes = ImageTk.PhotoImage(imgtesoura)
-btn3 = canva.create_image(250, 450, image=fototes, tags="botao")
-canva.tag_bind(btn3, "<Button-1>", lambda event: opicao(2)) #btn tesoura
+tespre = ImageTk.PhotoImage(imgtespre)
+imglagarto = Image.open("imagem/lagarto.png")
+imglagpre = brilho(imglagarto, 0.5)
 fotolag = ImageTk.PhotoImage(imglagarto)
-btn4 = canva.create_image(350, 450, image=fotolag, tags="botao")
-canva.tag_bind(btn4, "<Button-1>", lambda event: opicao(3)) #btn lagarto
-fotospo = ImageTk.PhotoImage(imgspock)
-btn5 = canva.create_image(450, 450, image=fotospo, tags="botao")
-canva.tag_bind(btn5, "<Button-1>", lambda event: opicao(4)) #btn spock
+lagpre = ImageTk.PhotoImage(imglagpre)
+imgspock = Image.open("imagem/spock.png")
+imgspocpre = brilho(imgspock, 0.5)
+fotospock = ImageTk.PhotoImage(imgspock)
+spockpre = ImageTk.PhotoImage(imgspocpre)
 
+referencia = {
+    'pedra': {'normal': fotope, 'preto': pedrapre},
+    'papel': {'normal': fotopa, 'preto': papelpre},
+    'tesoura': {'normal': fototes, 'preto': tespre},
+    'lagarto': {'normal': fotolag, 'preto': lagpre},
+    'spock': {'normal': fotospock, 'preto': spockpre},
+}
+
+# Botões de escolha
+btn1 = canva.create_image(50, 450, image=fotope, tags="pedra")
+btn2 = canva.create_image(150, 450, image=fotopa, tags="papel")
+btn3 = canva.create_image(250, 450, image=fototes, tags="tesoura")
+btn4 = canva.create_image(350, 450, image=fotolag, tags="lagarto")
+btn5 = canva.create_image(450, 450, image=fotospock, tags="spock")
+
+
+
+# Binding de 'pressionado' e 'solto' nos botões
+canva.tag_bind(btn1, "<ButtonPress>", lambda event, btn=btn1: pressionado(event, btn, canva, referencia['pedra']))
+canva.tag_bind(btn1, "<ButtonRelease>", lambda event, btn=btn1: solto(event, btn, canva, referencia['pedra']))
+canva.tag_bind(btn2, "<ButtonPress>", lambda event, btn=btn2: pressionado(event, btn, canva, referencia['papel']))
+canva.tag_bind(btn2, "<ButtonRelease>", lambda event, btn=btn2: solto(event, btn, canva, referencia['papel']))
+canva.tag_bind(btn3, "<ButtonPress>", lambda event, btn=btn3: pressionado(event, btn, canva, referencia['tesoura']))
+canva.tag_bind(btn3, "<ButtonRelease>", lambda event, btn=btn3: solto(event, btn, canva, referencia['tesoura']))
+canva.tag_bind(btn4, "<ButtonPress>", lambda event, btn=btn4: pressionado(event, btn, canva, referencia['lagarto']))
+canva.tag_bind(btn4, "<ButtonRelease>", lambda event, btn=btn4: solto(event, btn, canva, referencia['lagarto']))
+canva.tag_bind(btn5, "<ButtonPress>", lambda event, btn=btn5: pressionado(event, btn, canva, referencia['spock']))
+canva.tag_bind(btn5, "<ButtonRelease>", lambda event, btn=btn5: solto(event, btn, canva, referencia['spock']))
+
+# Variaveis de imagem
 logo = PhotoImage(file = 'imagem/logo.png')
 vsimg = PhotoImage(file = 'imagem/vs.png')
 scplay = PhotoImage(file = 'imagem/scoreplayer.png')

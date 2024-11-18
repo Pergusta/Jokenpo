@@ -26,6 +26,9 @@ def voltartela1():
 
 def irtela2():
     tela1.pack_forget()
+    canva2.delete(regras)
+    canva2.create_image(0, 0, image=img_regras_tk, anchor="nw")
+    canva2.tag_raise(voltar)
     tela2.pack(fill="both", expand=True)
 
 # Coisinha pra fazer o jokenpo ir de um em um ficar bonito
@@ -40,7 +43,7 @@ def jokenpo():
 
 # Função para limpar as informações antigas
 def limpeza_total():
-    canva.itemconfigure(maodireita, image=maoflipfinal)
+    canva.itemconfigure(maodireita, image=pcmaonormal)
     canva.itemconfigure(maoesquerda, image=maonormal)
     canva.itemconfig(jogada_player, text="")
     canva.itemconfig(jogada_computador, text="")
@@ -56,18 +59,17 @@ def opicao(opcoes):
     computador = randint(0, 4)
     jokenpo()
 
-
 def trocafoto():
     if computador == 0:
-        canva.itemconfigure(maodireita, image=maopeflipfinal)
+        canva.itemconfigure(maodireita, image=pcmaopedra)
     elif computador == 1:
-        canva.itemconfigure(maodireita, image=maopaflipfinal)
+        canva.itemconfigure(maodireita, image=pcmaopapel)
     elif computador == 2:
-        canva.itemconfigure(maodireita, image=maotesflipfinal)
+        canva.itemconfigure(maodireita, image=pcmaotesoura)
     elif computador == 3:
-        canva.itemconfigure(maodireita, image=maolagflipfinal)
+        canva.itemconfigure(maodireita, image=pcmaolargarto)
     elif computador == 4:
-        canva.itemconfigure(maodireita, image=maospoflipfinal)
+        canva.itemconfigure(maodireita, image=pcmaospock)
 
     if player == 0:
         canva.itemconfigure(maoesquerda, image=maopedra)
@@ -148,6 +150,7 @@ def animacaogif(canva, localgif):
         janela.after(100, animar)
     animar()
 
+# Função para alterar o brihlo das imagens e dar efeito de click
 def brilho(imagem, fator):
     escurecer = ImageEnhance.Brightness(imagem)
     return escurecer.enhance(fator)
@@ -159,7 +162,10 @@ def pressionado(event, btn, canva, referencia):
     canva.tag_bind("tesoura", "<ButtonRelease>", lambda event: opicao(2))
     canva.tag_bind("lagarto", "<ButtonRelease>", lambda event: opicao(3))
     canva.tag_bind("spock", "<ButtonRelease>", lambda event: opicao(4))
+    canva.tag_bind("regra", "<ButtonRelease>", lambda event: irtela2())
     canva.itemconfig(btn, image=referencia['preto'])
+    canva2.tag_bind('voltar', "<ButtonRelease>", lambda event: voltartela1())
+    canva2.itemconfig(btn, image=referencia['preto'])
 
 # Função para quando o botão for solto
 def solto(event, btn, canva, referencia):
@@ -184,6 +190,10 @@ janela.geometry(f"{janela_lar}x{janela_alt}+{pos_x}+{pos_y}")
 canva = Canvas(tela1, width=janela_lar, height=janela_alt, bg='white', highlightthickness=0)
 canva.pack(fill=BOTH, expand=True)
 
+# Criação de outro canvas para trabalhar com os Widgets na tela2
+canva2 = Canvas(tela2, width=janela_lar, height=janela_alt, bg='black', highlightthickness=0)
+canva2.pack(fill=BOTH, expand=True)
+
 # Processo de formatação da imagem para o background
 localgif = 'imagem/background.gif'
 animacaogif(canva, localgif)
@@ -191,8 +201,24 @@ animacaogif(canva, localgif)
 # Customização da fonte
 serifnegrito = tkfont.Font(family="MS Sans Serif", size=22, weight="bold")
 
-# Coisas que tem na tela 1
-irajuda = Button(tela1, text="REGRAS", command=irtela2)
+# Botão de regras
+imgregra = Image.open("imagem/btn_regras.png")
+imgregrapre = brilho(imgregra, 0.2)
+fotoregra = ImageTk.PhotoImage(imgregra)
+regrapre = ImageTk.PhotoImage(imgregrapre)
+regras = canva.create_image(33, 20, image=fotoregra, tags="regra")
+canva.tag_bind(regras, "<ButtonPress>", lambda event, btn=regras: pressionado(event, btn, canva, referencia['regra']))
+canva.tag_bind(regras, "<ButtonRelease>", lambda event, btn=regras: solto(event, btn, canva, referencia['regra']))
+
+# Botão voltar
+imgvoltar = Image.open("imagem/btn_voltar.png")
+imgvoltarpre = brilho(imgvoltar, 0.2)
+fotovoltar = ImageTk.PhotoImage(imgvoltar)
+voltarpre = ImageTk.PhotoImage(imgvoltarpre)
+voltar = canva2.create_image(250, 470, image=fotovoltar, tags="voltar")
+canva2.tag_bind(voltar, "<ButtonPress>", lambda event, btn=voltar: pressionado(event, btn, canva2, referencia['voltar']))
+canva2.tag_bind(voltar, "<ButtonRelease>", lambda event, btn=voltar: solto(event, btn, canva2, referencia['voltar']))
+
 
 # Formatação das imagens dos botões
 imgpedra = Image.open("imagem/pedra.png")
@@ -222,6 +248,8 @@ referencia = {
     'tesoura': {'normal': fototes, 'preto': tespre},
     'lagarto': {'normal': fotolag, 'preto': lagpre},
     'spock': {'normal': fotospock, 'preto': spockpre},
+    'regra': {'normal': fotoregra, 'preto': regrapre},
+    'voltar': {'normal': fotovoltar, 'preto': voltarpre},
 }
 
 # Botões de escolha
@@ -230,8 +258,6 @@ btn2 = canva.create_image(150, 450, image=fotopa, tags="papel")
 btn3 = canva.create_image(250, 450, image=fototes, tags="tesoura")
 btn4 = canva.create_image(350, 450, image=fotolag, tags="lagarto")
 btn5 = canva.create_image(450, 450, image=fotospock, tags="spock")
-
-
 
 # Binding de 'pressionado' e 'solto' nos botões
 canva.tag_bind(btn1, "<ButtonPress>", lambda event, btn=btn1: pressionado(event, btn, canva, referencia['pedra']))
@@ -250,46 +276,27 @@ logo = PhotoImage(file = 'imagem/logo.png')
 vsimg = PhotoImage(file = 'imagem/vs.png')
 scplay = PhotoImage(file = 'imagem/scoreplayer.png')
 scpc = PhotoImage(file = 'imagem/scorepc.png')
-maonormal = PhotoImage(file = 'imagem/maonormal.png')
-maopedra = PhotoImage(file = 'imagem/maopedra.png')
-maopapel = PhotoImage(file = 'imagem/maopapel.png')
-maotesora = PhotoImage(file = 'imagem/maotesora.png')
-maolargato = PhotoImage(file = 'imagem/maolargato.png')
-maospock = PhotoImage(file = 'imagem/maospock.png')
 
-# Flipar imagens para usar no COMPUTADOR
-maoflip = Image.open("imagem/maonormal.png")
-maoflip1 = maoflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maoflipfinal = ImageTk.PhotoImage(maoflip1)
+maonormal = PhotoImage(file = 'imagem/player_idle.png')
+maopedra = PhotoImage(file = 'imagem/player_pedra.png')
+maopapel = PhotoImage(file = 'imagem/player_papel.png')
+maotesora = PhotoImage(file = 'imagem/player_tesoura.png')
+maolargato = PhotoImage(file = 'imagem/player_lagarto.png')
+maospock = PhotoImage(file = 'imagem/player_spock.png')
 
-maopeflip = Image.open("imagem/maopedra.png")
-maopeflip1 = maopeflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maopeflipfinal = ImageTk.PhotoImage(maopeflip1)
-
-maopaflip = Image.open("imagem/maopapel.png")
-maopaflip1 = maopaflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maopaflipfinal = ImageTk.PhotoImage(maopaflip1)
-
-maotesflip = Image.open("imagem/maotesora.png")
-maotesflip1 = maotesflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maotesflipfinal = ImageTk.PhotoImage(maotesflip1)
-
-maolagflip = Image.open("imagem/maolargato.png")
-maolagflip1 = maolagflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maolagflipfinal = ImageTk.PhotoImage(maolagflip1)
-
-maospoflip = Image.open("imagem/maospock.png")
-maospoflip1 = maospoflip.transpose(Image.FLIP_LEFT_RIGHT)   
-maospoflipfinal = ImageTk.PhotoImage(maospoflip1)
+pcmaonormal = PhotoImage(file = 'imagem/cpu_idle.png')
+pcmaopedra = PhotoImage(file = 'imagem/cpu_pedra.png')
+pcmaopapel = PhotoImage(file = 'imagem/cpu_papel.png')
+pcmaotesoura = PhotoImage(file = 'imagem/cpu_tesoura.png')
+pcmaolargarto = PhotoImage(file = 'imagem/cpu_lagarto.png')
+pcmaospock = PhotoImage(file = 'imagem/cpu_spock.png')
 
 # Posicionamento das coisas que tem na tela1 com o canvas
 canva.create_text(100, 340, text="PLAYER", font=("MS Sans Serif", 16), fill="white") #nome player
 canva.create_text(400, 340, text="PC", font=("MS Sans Serif", 16), fill="white") #nome pc
-canva.create_window(33, 20, window=irajuda, anchor="center") #botao de regras
-canva.configure(scrollregion=canva.bbox("all"))
 preparo = canva.create_text(250, 130, text="", fill="yellow", font=("MS Sans Serif", 18)) #jokenpo
 maoesquerda = canva.create_image(100, 250, image=maonormal, anchor="center") # foto da jogada do player
-maodireita = canva.create_image(400, 250, image=maoflipfinal, anchor="center") # foto da jogada do computador
+maodireita = canva.create_image(400, 250, image=pcmaonormal, anchor="center") # foto da jogada do computador
 jogada_player = canva.create_text(100, 200, text='', fill='white', font=("MS Sans Serif", 10), anchor="center") #registro de jogada player
 jogada_computador = canva.create_text(400, 200, text='', fill='white', font=("MS Sans Serif", 10), anchor="center")#registro de jogada pc
 resultado = canva.create_text(250, 180, text="", font=serifnegrito) #resultado
@@ -302,15 +309,9 @@ canva.create_image(410, 130, image=scpc, anchor="center") #foto do score pc
 canva.tag_raise(pontosa)
 canva.tag_raise(pontosb)
 
-# Coisas da tela 2
-btnvoltar = Button(tela2, text="Voltar", command=voltartela1)
-
-# Processo para ler e converter a imagem das regras para que o tk consiga mostrar
+# Processo para ler e converter a imagem das regras na tela 2 para que o tk consiga mostrar
 img_regras = Image.open("imagem/regras.png")
 img_regras_tk = ImageTk.PhotoImage(img_regras)
-label_img = Label(tela2, image=img_regras_tk)
-label_img.pack(pady=20)
-btnvoltar.pack(pady=10)
 
 ## Execução da janela
 tela1.pack(fill=BOTH, expand=True)
